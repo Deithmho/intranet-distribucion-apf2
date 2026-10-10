@@ -1,124 +1,124 @@
-# Intranet Distribución - Backend API
+# Intranet de distribución APF2
 
-Backend desarrollado en **Spring Boot 3** con arquitectura por capas, preparado para conectarse a **PostgreSQL (Supabase)**. Este sistema gestiona los módulos de logística, pedidos, almacenes, flota y seguimiento en tiempo real para la intranet de distribución.
+Backend del proyecto académico **Implementación de una intranet para la gestión de distribución en una empresa Backus**. Continuación individual del avance 01 para el curso Desarrollo Web Integrado, enfocada en persistencia y seguridad.
 
----
+- Autor del APF2: Mathias Sebastian Herrera Gutierrez — U23263869.
+- Sección: 60618.
+- Docente: Cesar Augusto Cardenas la torre.
+- Procedencia del código grupal: [ORIGEN.md](ORIGEN.md).
+- Caso académico con datos sintéticos; sin acceso a sistemas reales de Backus.
 
-## Arquitectura del Proyecto
+## Tecnologías
 
-El proyecto sigue una **Arquitectura por Capas (Layered Architecture)** para garantizar un alto grado de desacoplamiento, mantenibilidad y facilidad de prueba.
+Java 21, Spring Boot 3.5.16, Gradle Wrapper 8.8, Spring Data JPA/Hibernate, PostgreSQL 17.11, Spring Security, JJWT 0.12.6, BCrypt y Testcontainers 1.21.4. Se mantiene Gradle del proyecto original; no se necesita instalar Maven.
+
+## Ejecución local
+
+Requisitos: JDK 21, Docker con Compose, Git, Bash y OpenSSL. El primer arranque descarga dependencias desde sus repositorios oficiales.
+
+```bash
+git clone https://github.com/Deithmho/intranet-distribucion-apf2.git
+cd intranet-distribucion-apf2
+bash scripts/iniciar.sh
+```
+
+El script genera `.env` con contraseñas y clave JWT aleatorias, levanta PostgreSQL en `localhost:55432` y ejecuta la API en `localhost:8080`. El usuario inicial es el valor `ADMIN_EMAIL`; consulta `ADMIN_PASSWORD` en tu `.env` para hacer login. Estos valores pertenecen a tu instalación local y no se incluyen en el repositorio ni en la colección.
+
+Para usar PostgreSQL ya instalado, ejecuta `bash scripts/configurar-entorno.sh`, ajusta `DB_URL`, `DB_USERNAME` y `DB_PASSWORD` en `.env` y carga las variables antes de `./gradlew bootRun`. Las propiedades leen esas variables; Spring Boot no carga `.env` por sí solo. Para Supabase configura un `DB_URL` con el host y SSL de tu propia cuenta.
+
+```bash
+set -a
+source .env
+set +a
+./gradlew bootRun --no-daemon
+```
+
+`spring.jpa.hibernate.ddl-auto=update` permite observar las tablas creadas por Hibernate en esta entrega académica. Para un despliegue productivo posterior se recomiendan migraciones y `validate`.
+
+## Arquitectura por capas
 
 ```text
 com.dwi.intranetdistribucion
-│
-├── config/           # Configuraciones globales (CORS, Seguridad, Swagger/OpenAPI, Beans)
-├── controller/       # Capa de Presentación (Controladores REST que exponen los endpoints)
-├── dto/              # Data Transfer Objects (Objetos de transferencia para Request y Response)
-│   ├── request/
-│   └── response/
-├── exception/        # Manejo global de excepciones (@RestControllerAdvice)
-├── model/            # Capa de Dominio / Entidades JPA (Mapeo a la base de datos)
-├── repository/       # Capa de Acceso a Datos (Spring Data JPA Repositories)
-├── service/          # Capa de Servicio (Interfaces con contratos de lógica de negocio)
-│   └── impl/         # Implementaciones concretas de la lógica de negocio
-└── util/             # Clases utilitarias (Constantes, Helpers, Formateadores)
+├── config/              configuración de CORS e inicialización
+│   └── security/         JWT, filtro y SecurityFilterChain
+├── controller/          API REST
+├── dto/
+│   ├── request/          entradas validadas
+│   └── response/         respuestas sin contraseña ni entidades completas
+├── exception/           errores HTTP consistentes
+├── model/               entidades JPA
+├── repository/          JpaRepository y consultas JPQL
+├── service/             contratos de negocio
+│   └── impl/            lógica y transacciones
+└── util/                reservado para extensiones del proyecto base
 ```
 
----
+## Alcance implementado
 
-## Requisitos Previos
+| RF del avance 01 | Estado en APF2 |
+|---|---|
+| RF-01 Inicio de sesión | JWT firmado y expirable, BCrypt, cinco fallos bloquean la cuenta |
+| RF-02 Roles y permisos | CRUD de roles; permisos validados; ADMIN, ALMACENERO y AUDITOR |
+| RF-03 Usuarios | CRUD administrativo con asignación de rol y estado activo |
+| RF-04 Sedes | CRUD y restricción de borrado cuando tiene almacenes |
+| RF-05 Almacenes | CRUD, relación con sede y conservación del historial |
+| RF-06 Productos | CRUD, código único, categoría y stock mínimo |
+| RF-07 Categorías | CRUD; no se borran categorías referenciadas |
+| RF-08 Stock | Entradas, traslados, consulta de stock crítico e historial; salidas registradas por traslado |
 
-- **Java JDK:** 17 o 23
-- **Gestor de paquetes:** Gradle (incluido mediante `./gradlew`)
-- **Base de Datos:** PostgreSQL 15+ (o instancia en Supabase)
+RF-09 a RF-26 permanecen en el backlog para siguientes avances: clientes, pedidos, aprobación, comprobantes, rutas, entregas, flota, exportaciones y dashboard. El frontend Angular se conserva como propuesta del APF1; este repositorio entrega la API backend y sus pruebas.
 
----
+## Endpoints y permisos
 
-## Configuración del Entorno
+Base: `/api/v1`. Solo `POST /auth/login` y `GET /public/estado` son públicos. `POST /auth/register` requiere `USUARIOS_CREAR`; no existe autoasignación pública de roles.
 
-Configurar las credenciales de la base de datos en `src/main/resources/application.properties`:
+| Recurso | Métodos | Lectura | Escritura |
+|---|---|---|---|
+| `/usuarios` y `/{id}` | GET POST PUT DELETE | USUARIOS_VER | USUARIOS_CREAR |
+| `/roles`, `/{id}`, `/roles/permisos` | GET POST PUT DELETE | ROLES_GESTIONAR | ROLES_GESTIONAR |
+| `/sedes`, `/almacenes`, `/categorias`, `/productos` | GET POST PUT DELETE | INVENTARIO_VER | INVENTARIO_GESTIONAR |
+| `/inventario`, `/inventario/movimientos` | GET | INVENTARIO_VER | — |
+| `/inventario/entradas`, `/inventario/traslados` | POST | — | INVENTARIO_GESTIONAR |
 
-```properties
-spring.datasource.url=jdbc:postgresql://<TU-HOST-SUPABASE>:5432/postgres?sslmode=require
-spring.datasource.username=<TU-USUARIO-POSTGRES>
-spring.datasource.password=<TU-PASSWORD>
+`GET /productos?categoriaId=1&texto=producto` y `GET /inventario?almacenId=1&categoriaId=1&critico=true` ejecutan JPQL parametrizado. Sustituye los IDs por los obtenidos al crear datos.
+
+ADMIN dispone de todos los permisos iniciales; ALMACENERO gestiona inventario; AUDITOR consulta inventario. Los permisos se vuelven a leer desde la base de datos en cada solicitud, así que un token no mantiene privilegios de un usuario eliminado, bloqueado o inactivo.
+
+Los traslados bloquean la fila del producto (`PESSIMISTIC_WRITE`) dentro de una transacción. La restricción única producto-almacén y el campo `@Version` refuerzan la consistencia. Se realiza la salida, la entrada y el movimiento como una unidad; un destino inexistente revierte incluso una salida ya enviada a PostgreSQL.
+
+## Pruebas y evidencias
+
+```bash
+./gradlew clean test bootJar --no-daemon
 ```
 
----
+Las 14 pruebas de integración levantan PostgreSQL aislado con Testcontainers; requieren Docker y no utilizan tu base de desarrollo. Incluyen CRUD, JPQL, 401/403, JWT expirado/firma incorrecta, bloqueo, usuario inactivo, conservación del stock, rollback y traslados simultáneos. Resultados locales: `build/reports/tests/test/index.html`. GitHub Actions ejecuta la misma validación.
 
-## Comandos de Desarrollo
+Con la API iniciada, en otra terminal:
 
-```powershell
-# Compilar el proyecto
-.\gradlew compileJava
-
-# Ejecutar las pruebas unitarias
-.\gradlew test
-
-# Iniciar el servidor en modo desarrollo (Puerto 8080)
-.\gradlew bootRun
+```bash
+set -a
+source .env
+set +a
+python3 scripts/validar-api.py
+docker compose exec -T db psql -U intranet -d intranet -f - < scripts/evidencia-bd.sql
 ```
 
----
+`validar-api.py` ejecuta 36 solicitudes mediante cURL, genera datos sintéticos y guarda respuestas redactadas en `docs/evidencias`. Está restringido a localhost. Cada ejecución usa códigos diferentes; no borra los movimientos históricos. El script requiere Python 3 estándar y cURL. Ver [evidencias](docs/evidencias/resultados-api.md) y [resultado de integración](docs/evidencias/resultados-integracion.json).
 
-## Mapa de Módulos y Requerimientos Funcionales (Issues)
+## Postman
 
-A continuación se detallan los módulos planeados y mapeados según el backlog del proyecto:
+Importa `postman/APF2.postman_collection.json` y `postman/APF2.postman_environment.json`. Selecciona el entorno APF2 local y completa `adminPassword` con tu valor local. Ejecuta la colección en orden con Collection Runner. El login guarda el token y las respuestas guardan los IDs de cada registro. La colección incluye pruebas de HTTP y rollback; las contraseñas y tokens no tienen valores exportados.
 
-### 1. Seguridad y Acceso
+## Detener el entorno
 
-- `RF-01`: Módulo de inicio de sesión (JWT / Auth)
-- `RF-02`: Módulo de roles y permisos (RBAC)
+Detén Spring Boot con Ctrl+C. Ejecuta `docker compose stop db` para detener PostgreSQL y conservar los datos. Para reanudar: `bash scripts/iniciar.sh`.
 
-### 2. Administración Base
+## Informe y referencias
 
-- `RF-03`: Gestión de usuarios
-- `RF-04`: Gestión de sedes
-- `RF-05`: Gestión de almacenes
+El informe técnico del APF2 se encuentra en `docs/informe/`, con portada individual y evidencias reproducibles.
 
-### 3. Catálogo e Inventario
-
-- `RF-06`: Gestión de productos
-- `RF-07`: Gestión de categorías
-- `RF-08`: Control de stock e inventario
-
-### 4. Pedidos y Clientes
-
-- `RF-09`: Gestión de clientes
-- `RF-10`: Generación de pedidos
-- `RF-11`: Aprobación de pedidos
-- `RF-12`: Facturación y guías de remisión
-
-### 5. Rutas y Logística de Distribución
-
-- `RF-13`: Zonas de reparto
-- `RF-14`: Rutas de distribución
-- `RF-15`: Asignación de pedidos a rutas
-- `RF-16`: Seguimiento de entregas
-- `RF-17`: Incidencias de entrega
-
-### 6. Flota y Conductores
-
-- `RF-18`: Gestión de vehículos
-- `RF-19`: Gestión de conductores
-- `RF-20`: Mantenimiento de flota
-- `RF-21`: Asignación vehículo-conductor-ruta
-
-### 7. Reportes y Analítica
-
-- `RF-22`: Reporte de inventario (PDF/Excel)
-- `RF-23`: Reporte de pedidos
-- `RF-24`: Reporte de entregas y cumplimiento
-- `RF-25`: Reporte de productividad de flota
-- `RF-26`: Dashboard general de KPIs logísticos
-
----
-
-## Licencia y Autoría
-
-Desarrollado por el equipo de **Desarrollo Web Integrado - UTP**.
-
-- Navarro Domínguez, Rommel Eduardo
-- Pujay Narciso, Alinder Steeven
-- Alvarado Chávez, Romina Liz
-- Herrera Gutierreez, Mathias Sebastian
+- [Spring Boot 3.5 requisitos](https://docs.spring.io/spring-boot/3.5/system-requirements.html)
+- [Spring Data JPA y JPQL](https://docs.spring.io/spring-data/jpa/reference/jpa/query-methods.html)
+- [Spring Security](https://docs.spring.io/spring-security/reference/servlet/authentication/passwords/index.html)
+- [JJWT](https://github.com/jwtk/jjwt)

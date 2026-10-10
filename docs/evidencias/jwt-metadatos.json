@@ -1,0 +1,5 @@
+{
+  "algoritmo": "HS384",
+  "tokenType": "Bearer",
+  "token_publicado": false
+}

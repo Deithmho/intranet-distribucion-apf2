@@ -1,0 +1,31 @@
+   table_name   
+----------------
+ almacenes
+ categorias
+ existencias
+ movimientos
+ permisos
+ productos
+ roles
+ roles_permisos
+ sedes
+ usuarios
+(10 rows)
+
+  codigo  |        nombre        | almacen  | cantidad | stock_minimo 
+----------+----------------------+----------+----------+--------------
+ P-317601 | Producto actualizado | A-317601 |       13 |           10
+ P-317601 | Producto actualizado | B-317601 |        7 |           10
+(2 rows)
+
+ id |   tipo   | cantidad | origen_id | destino_id |    responsable     
+----+----------+----------+-----------+------------+--------------------
+  1 | ENTRADA  |       20 |           |          1 | admin@example.test
+  2 | TRASLADO |        7 |         1 |          2 | admin@example.test
+(2 rows)
+
+       email        | es_activo | intentos_fallidos | es_bloqueado 
+--------------------+-----------+-------------------+--------------
+ admin@example.test | t         |                 0 | f
+(1 row)
+

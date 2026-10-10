@@ -1,0 +1,22 @@
+{
+  "tests": "14",
+  "failures": "0",
+  "errors": "0",
+  "skipped": "0",
+  "casos": [
+    "duplicateAndInvalidInputs()",
+    "inactiveUserCannotReuseIssuedToken()",
+    "productJpqlAndDeleteRules()",
+    "userAndRoleCrudRejectInvalidPermissions()",
+    "failedLoginCounterPersistsAndLocksAtFive()",
+    "malformedExpiredAndInvalidSignatureAre401()",
+    "categoryCrud()",
+    "auditorReadOnlyAndPasswordsNotExposed()",
+    "warehouseIntegrityAndCrud()",
+    "insufficientStockDoesNotChangeDatabase()",
+    "concurrentTransfersCannotOverdrawStock()",
+    "transferConservesStockAndRegistersAudit()",
+    "rollbackReversesAnAlreadyFlushedStockUpdate()",
+    "missingTokenAndPublicStatus()"
+  ]
+}

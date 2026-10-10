@@ -1,0 +1,777 @@
+{
+  "fecha": "2026-10-09T21:31:30.342271-05:00",
+  "entorno": "http://localhost:8080",
+  "herramienta": "cURL",
+  "casos": [
+    {
+      "caso": "Acceso protegido sin JWT",
+      "metodo": "GET",
+      "ruta": "/api/v1/productos",
+      "authorization": "sin token",
+      "solicitud": null,
+      "esperado": 401,
+      "http": 401,
+      "resultado": "OK",
+      "respuesta": {
+        "status": 401,
+        "mensaje": "Se requiere un token válido"
+      }
+    },
+    {
+      "caso": "Inicio de sesión y generación JWT",
+      "metodo": "POST",
+      "ruta": "/api/v1/auth/login",
+      "authorization": "sin token",
+      "solicitud": {
+        "email": "admin@example.test",
+        "password": "[OMITIDO]"
+      },
+      "esperado": 200,
+      "http": 200,
+      "resultado": "OK",
+      "respuesta": {
+        "accessToken": "[OMITIDO]",
+        "tokenType": "Bearer"
+      }
+    },
+    {
+      "caso": "Mismo endpoint con JWT válido",
+      "metodo": "GET",
+      "ruta": "/api/v1/productos",
+      "authorization": "Bearer [OMITIDO]",
+      "solicitud": null,
+      "esperado": 200,
+      "http": 200,
+      "resultado": "OK",
+      "respuesta": []
+    },
+    {
+      "caso": "JWT malformado",
+      "metodo": "GET",
+      "ruta": "/api/v1/productos",
+      "authorization": "Bearer [OMITIDO]",
+      "solicitud": null,
+      "esperado": 401,
+      "http": 401,
+      "resultado": "OK",
+      "respuesta": {
+        "status": 401,
+        "mensaje": "Token inválido, expirado o usuario no habilitado"
+      }
+    },
+    {
+      "caso": "Firma JWT alterada",
+      "metodo": "GET",
+      "ruta": "/api/v1/productos",
+      "authorization": "Bearer [OMITIDO]",
+      "solicitud": null,
+      "esperado": 401,
+      "http": 401,
+      "resultado": "OK",
+      "respuesta": {
+        "status": 401,
+        "mensaje": "Token inválido, expirado o usuario no habilitado"
+      }
+    },
+    {
+      "caso": "Crear categoría",
+      "metodo": "POST",
+      "ruta": "/api/v1/categorias",
+      "authorization": "Bearer [OMITIDO]",
+      "solicitud": {
+        "nombre": "Bebidas-317601",
+        "descripcion": "Datos sintéticos APF2"
+      },
+      "esperado": 201,
+      "http": 201,
+      "resultado": "OK",
+      "respuesta": {
+        "id": 1,
+        "nombre": "Bebidas-317601",
+        "descripcion": "Datos sintu00e9ticos APF2"
+      }
+    },
+    {
+      "caso": "Crear sede",
+      "metodo": "POST",
+      "ruta": "/api/v1/sedes",
+      "authorization": "Bearer [OMITIDO]",
+      "solicitud": {
+        "codigo": "S-317601",
+        "nombre": "Sede académica Lima",
+        "direccion": "Dirección de demostración"
+      },
+      "esperado": 201,
+      "http": 201,
+      "resultado": "OK",
+      "respuesta": {
+        "id": 1,
+        "codigo": "S-317601",
+        "nombre": "Sede acadu00e9mica Lima",
+        "direccion": "Direcciu00f3n de demostraciu00f3n"
+      }
+    },
+    {
+      "caso": "Crear almacén origen",
+      "metodo": "POST",
+      "ruta": "/api/v1/almacenes",
+      "authorization": "Bearer [OMITIDO]",
+      "solicitud": {
+        "codigo": "A-317601",
+        "nombre": "Almacén origen",
+        "sedeId": 1
+      },
+      "esperado": 201,
+      "http": 201,
+      "resultado": "OK",
+      "respuesta": {
+        "id": 1,
+        "codigo": "A-317601",
+        "nombre": "Almacu00e9n origen",
+        "sedeId": 1
+      }
+    },
+    {
+      "caso": "Crear almacén destino",
+      "metodo": "POST",
+      "ruta": "/api/v1/almacenes",
+      "authorization": "Bearer [OMITIDO]",
+      "solicitud": {
+        "codigo": "B-317601",
+        "nombre": "Almacén destino",
+        "sedeId": 1
+      },
+      "esperado": 201,
+      "http": 201,
+      "resultado": "OK",
+      "respuesta": {
+        "id": 2,
+        "codigo": "B-317601",
+        "nombre": "Almacu00e9n destino",
+        "sedeId": 1
+      }
+    },
+    {
+      "caso": "Crear producto",
+      "metodo": "POST",
+      "ruta": "/api/v1/productos",
+      "authorization": "Bearer [OMITIDO]",
+      "solicitud": {
+        "codigo": "P-317601",
+        "nombre": "Producto demostrativo",
+        "unidadMedida": "caja",
+        "stockMinimo": 10,
+        "categoriaId": 1
+      },
+      "esperado": 201,
+      "http": 201,
+      "resultado": "OK",
+      "respuesta": {
+        "id": 1,
+        "codigo": "P-317601",
+        "nombre": "Producto demostrativo",
+        "unidadMedida": "caja",
+        "stockMinimo": 10,
+        "categoriaId": 1,
+        "categoria": "Bebidas-317601"
+      }
+    },
+    {
+      "caso": "Consultar producto",
+      "metodo": "GET",
+      "ruta": "/api/v1/productos/1",
+      "authorization": "Bearer [OMITIDO]",
+      "solicitud": null,
+      "esperado": 200,
+      "http": 200,
+      "resultado": "OK",
+      "respuesta": {
+        "id": 1,
+        "codigo": "P-317601",
+        "nombre": "Producto demostrativo",
+        "unidadMedida": "caja",
+        "stockMinimo": 10,
+        "categoriaId": 1,
+        "categoria": "Bebidas-317601"
+      }
+    },
+    {
+      "caso": "Actualizar producto",
+      "metodo": "PUT",
+      "ruta": "/api/v1/productos/1",
+      "authorization": "Bearer [OMITIDO]",
+      "solicitud": {
+        "codigo": "P-317601",
+        "nombre": "Producto actualizado",
+        "unidadMedida": "caja",
+        "stockMinimo": 10,
+        "categoriaId": 1
+      },
+      "esperado": 200,
+      "http": 200,
+      "resultado": "OK",
+      "respuesta": {
+        "id": 1,
+        "codigo": "P-317601",
+        "nombre": "Producto actualizado",
+        "unidadMedida": "caja",
+        "stockMinimo": 10,
+        "categoriaId": 1,
+        "categoria": "Bebidas-317601"
+      }
+    },
+    {
+      "caso": "Búsqueda JPQL por categoría y nombre",
+      "metodo": "GET",
+      "ruta": "/api/v1/productos?categoriaId=1&texto=actualizado",
+      "authorization": "Bearer [OMITIDO]",
+      "solicitud": null,
+      "esperado": 200,
+      "http": 200,
+      "resultado": "OK",
+      "respuesta": [
+        {
+          "id": 1,
+          "codigo": "P-317601",
+          "nombre": "Producto actualizado",
+          "unidadMedida": "caja",
+          "stockMinimo": 10,
+          "categoriaId": 1,
+          "categoria": "Bebidas-317601"
+        }
+      ]
+    },
+    {
+      "caso": "Rechazar categoría referenciada",
+      "metodo": "DELETE",
+      "ruta": "/api/v1/categorias/1",
+      "authorization": "Bearer [OMITIDO]",
+      "solicitud": null,
+      "esperado": 409,
+      "http": 409,
+      "resultado": "OK",
+      "respuesta": {
+        "timestamp": "2026-10-09T21:31:29.443276",
+        "mensaje": "La operación contradice una regla de integridad o de negocio",
+        "detalles": "CONFLICT"
+      }
+    },
+    {
+      "caso": "Rechazar código duplicado",
+      "metodo": "POST",
+      "ruta": "/api/v1/productos",
+      "authorization": "Bearer [OMITIDO]",
+      "solicitud": {
+        "codigo": "P-317601",
+        "nombre": "Producto actualizado",
+        "unidadMedida": "caja",
+        "stockMinimo": 10,
+        "categoriaId": 1
+      },
+      "esperado": 409,
+      "http": 409,
+      "resultado": "OK",
+      "respuesta": {
+        "timestamp": "2026-10-09T21:31:29.477744",
+        "mensaje": "La operación contradice una regla de integridad o de negocio",
+        "detalles": "CONFLICT"
+      }
+    },
+    {
+      "caso": "Rechazar datos inválidos",
+      "metodo": "POST",
+      "ruta": "/api/v1/productos",
+      "authorization": "Bearer [OMITIDO]",
+      "solicitud": {},
+      "esperado": 400,
+      "http": 400,
+      "resultado": "OK",
+      "respuesta": {
+        "timestamp": "2026-10-09T21:31:29.510555",
+        "mensaje": "Datos de entrada no válidos",
+        "detalles": "BAD_REQUEST"
+      }
+    },
+    {
+      "caso": "Entrada de existencias",
+      "metodo": "POST",
+      "ruta": "/api/v1/inventario/entradas",
+      "authorization": "Bearer [OMITIDO]",
+      "solicitud": {
+        "productoId": 1,
+        "almacenId": 1,
+        "cantidad": 20,
+        "motivo": "Ingreso académico"
+      },
+      "esperado": 201,
+      "http": 201,
+      "resultado": "OK",
+      "respuesta": {
+        "id": 1,
+        "productoId": 1,
+        "origenId": null,
+        "destinoId": 1,
+        "cantidad": 20,
+        "tipo": "ENTRADA",
+        "motivo": "Ingreso acadu00e9mico",
+        "responsable": "admin@example.test",
+        "fecha": "2026-10-09T21:31:29.556444"
+      }
+    },
+    {
+      "caso": "Traslado atómico entre almacenes",
+      "metodo": "POST",
+      "ruta": "/api/v1/inventario/traslados",
+      "authorization": "Bearer [OMITIDO]",
+      "solicitud": {
+        "productoId": 1,
+        "origenId": 1,
+        "destinoId": 2,
+        "cantidad": 7,
+        "motivo": "Despacho académico"
+      },
+      "esperado": 201,
+      "http": 201,
+      "resultado": "OK",
+      "respuesta": {
+        "id": 2,
+        "productoId": 1,
+        "origenId": 1,
+        "destinoId": 2,
+        "cantidad": 7,
+        "tipo": "TRASLADO",
+        "motivo": "Despacho acadu00e9mico",
+        "responsable": "admin@example.test",
+        "fecha": "2026-10-09T21:31:29.609046"
+      }
+    },
+    {
+      "caso": "Consultar stock origen después del traslado",
+      "metodo": "GET",
+      "ruta": "/api/v1/inventario?almacenId=1",
+      "authorization": "Bearer [OMITIDO]",
+      "solicitud": null,
+      "esperado": 200,
+      "http": 200,
+      "resultado": "OK",
+      "respuesta": [
+        {
+          "id": 1,
+          "productoId": 1,
+          "codigo": "P-317601",
+          "producto": "Producto actualizado",
+          "almacenId": 1,
+          "almacen": "Almacu00e9n origen",
+          "cantidad": 13,
+          "stockMinimo": 10,
+          "critico": false
+        }
+      ]
+    },
+    {
+      "caso": "Consulta JPQL de stock crítico",
+      "metodo": "GET",
+      "ruta": "/api/v1/inventario?almacenId=2&categoriaId=1&critico=true",
+      "authorization": "Bearer [OMITIDO]",
+      "solicitud": null,
+      "esperado": 200,
+      "http": 200,
+      "resultado": "OK",
+      "respuesta": [
+        {
+          "id": 2,
+          "productoId": 1,
+          "codigo": "P-317601",
+          "producto": "Producto actualizado",
+          "almacenId": 2,
+          "almacen": "Almacu00e9n destino",
+          "cantidad": 7,
+          "stockMinimo": 10,
+          "critico": true
+        }
+      ]
+    },
+    {
+      "caso": "Rechazar traslado por stock insuficiente",
+      "metodo": "POST",
+      "ruta": "/api/v1/inventario/traslados",
+      "authorization": "Bearer [OMITIDO]",
+      "solicitud": {
+        "productoId": 1,
+        "origenId": 1,
+        "destinoId": 2,
+        "cantidad": 99,
+        "motivo": "Prueba de integridad"
+      },
+      "esperado": 409,
+      "http": 409,
+      "resultado": "OK",
+      "respuesta": {
+        "timestamp": "2026-10-09T21:31:29.714874",
+        "mensaje": "La operación contradice una regla de integridad o de negocio",
+        "detalles": "CONFLICT"
+      }
+    },
+    {
+      "caso": "Rollback con destino inexistente",
+      "metodo": "POST",
+      "ruta": "/api/v1/inventario/traslados",
+      "authorization": "Bearer [OMITIDO]",
+      "solicitud": {
+        "productoId": 1,
+        "origenId": 1,
+        "destinoId": 999999999,
+        "cantidad": 3,
+        "motivo": "Prueba de rollback"
+      },
+      "esperado": 404,
+      "http": 404,
+      "resultado": "OK",
+      "respuesta": {
+        "timestamp": "2026-10-09T21:31:29.750856",
+        "mensaje": "Almacén no encontrado",
+        "detalles": "NOT_FOUND"
+      }
+    },
+    {
+      "caso": "Stock conservado tras la reversión",
+      "metodo": "GET",
+      "ruta": "/api/v1/inventario?almacenId=1",
+      "authorization": "Bearer [OMITIDO]",
+      "solicitud": null,
+      "esperado": 200,
+      "http": 200,
+      "resultado": "OK",
+      "respuesta": [
+        {
+          "id": 1,
+          "productoId": 1,
+          "codigo": "P-317601",
+          "producto": "Producto actualizado",
+          "almacenId": 1,
+          "almacen": "Almacu00e9n origen",
+          "cantidad": 13,
+          "stockMinimo": 10,
+          "critico": false
+        }
+      ]
+    },
+    {
+      "caso": "Historial de movimientos",
+      "metodo": "GET",
+      "ruta": "/api/v1/inventario/movimientos",
+      "authorization": "Bearer [OMITIDO]",
+      "solicitud": null,
+      "esperado": 200,
+      "http": 200,
+      "resultado": "OK",
+      "respuesta": [
+        {
+          "id": 1,
+          "productoId": 1,
+          "origenId": null,
+          "destinoId": 1,
+          "cantidad": 20,
+          "tipo": "ENTRADA",
+          "motivo": "Ingreso acadu00e9mico",
+          "responsable": "admin@example.test",
+          "fecha": "2026-10-09T21:31:29.556444"
+        },
+        {
+          "id": 2,
+          "productoId": 1,
+          "origenId": 1,
+          "destinoId": 2,
+          "cantidad": 7,
+          "tipo": "TRASLADO",
+          "motivo": "Despacho acadu00e9mico",
+          "responsable": "admin@example.test",
+          "fecha": "2026-10-09T21:31:29.609046"
+        }
+      ]
+    },
+    {
+      "caso": "Roles y permisos",
+      "metodo": "GET",
+      "ruta": "/api/v1/roles",
+      "authorization": "Bearer [OMITIDO]",
+      "solicitud": null,
+      "esperado": 200,
+      "http": 200,
+      "resultado": "OK",
+      "respuesta": [
+        {
+          "id": 1,
+          "nombre": "ADMIN",
+          "descripcion": "Rol base ADMIN",
+          "permisos": [
+            {
+              "id": 5,
+              "nombre": "INVENTARIO_GESTIONAR",
+              "descripcion": "INVENTARIO GESTIONAR",
+              "modulo": "INVENTARIO"
+            },
+            {
+              "id": 2,
+              "nombre": "USUARIOS_CREAR",
+              "descripcion": "USUARIOS CREAR",
+              "modulo": "SEGURIDAD"
+            },
+            {
+              "id": 1,
+              "nombre": "USUARIOS_VER",
+              "descripcion": "USUARIOS VER",
+              "modulo": "SEGURIDAD"
+            },
+            {
+              "id": 3,
+              "nombre": "ROLES_GESTIONAR",
+              "descripcion": "ROLES GESTIONAR",
+              "modulo": "SEGURIDAD"
+            },
+            {
+              "id": 4,
+              "nombre": "INVENTARIO_VER",
+              "descripcion": "INVENTARIO VER",
+              "modulo": "INVENTARIO"
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "nombre": "ALMACENERO",
+          "descripcion": "Rol base ALMACENERO",
+          "permisos": [
+            {
+              "id": 5,
+              "nombre": "INVENTARIO_GESTIONAR",
+              "descripcion": "INVENTARIO GESTIONAR",
+              "modulo": "INVENTARIO"
+            },
+            {
+              "id": 4,
+              "nombre": "INVENTARIO_VER",
+              "descripcion": "INVENTARIO VER",
+              "modulo": "INVENTARIO"
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "nombre": "AUDITOR",
+          "descripcion": "Rol base AUDITOR",
+          "permisos": [
+            {
+              "id": 4,
+              "nombre": "INVENTARIO_VER",
+              "descripcion": "INVENTARIO VER",
+              "modulo": "INVENTARIO"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "caso": "Administrador crea auditor",
+      "metodo": "POST",
+      "ruta": "/api/v1/usuarios",
+      "authorization": "Bearer [OMITIDO]",
+      "solicitud": {
+        "nombre": "Auditor",
+        "apellido": "Académico",
+        "email": "auditor-317601@example.test",
+        "password": "[OMITIDO]",
+        "rolId": 3
+      },
+      "esperado": 201,
+      "http": 201,
+      "resultado": "OK",
+      "respuesta": {
+        "id": 2,
+        "rolId": 3,
+        "rolNombre": "AUDITOR",
+        "nombre": "Auditor",
+        "apellido": "Acadu00e9mico",
+        "email": "auditor-317601@example.test",
+        "esActivo": true,
+        "fechaCreacion": "2026-10-09T21:31:29.981237"
+      }
+    },
+    {
+      "caso": "Inicio de sesión del auditor",
+      "metodo": "POST",
+      "ruta": "/api/v1/auth/login",
+      "authorization": "sin token",
+      "solicitud": {
+        "email": "auditor-317601@example.test",
+        "password": "[OMITIDO]"
+      },
+      "esperado": 200,
+      "http": 200,
+      "resultado": "OK",
+      "respuesta": {
+        "accessToken": "[OMITIDO]",
+        "tokenType": "Bearer"
+      }
+    },
+    {
+      "caso": "Auditor consulta inventario",
+      "metodo": "GET",
+      "ruta": "/api/v1/inventario",
+      "authorization": "Bearer [OMITIDO]",
+      "solicitud": null,
+      "esperado": 200,
+      "http": 200,
+      "resultado": "OK",
+      "respuesta": [
+        {
+          "id": 1,
+          "productoId": 1,
+          "codigo": "P-317601",
+          "producto": "Producto actualizado",
+          "almacenId": 1,
+          "almacen": "Almacu00e9n origen",
+          "cantidad": 13,
+          "stockMinimo": 10,
+          "critico": false
+        },
+        {
+          "id": 2,
+          "productoId": 1,
+          "codigo": "P-317601",
+          "producto": "Producto actualizado",
+          "almacenId": 2,
+          "almacen": "Almacu00e9n destino",
+          "cantidad": 7,
+          "stockMinimo": 10,
+          "critico": true
+        }
+      ]
+    },
+    {
+      "caso": "Auditor no puede modificar catálogo",
+      "metodo": "POST",
+      "ruta": "/api/v1/categorias",
+      "authorization": "Bearer [OMITIDO]",
+      "solicitud": {
+        "nombre": "No permitida"
+      },
+      "esperado": 403,
+      "http": 403,
+      "resultado": "OK",
+      "respuesta": {
+        "timestamp": "2026-10-09T21:31:30.176418",
+        "mensaje": "Permiso insuficiente",
+        "detalles": "FORBIDDEN"
+      }
+    },
+    {
+      "caso": "Auditor no puede administrar usuarios",
+      "metodo": "GET",
+      "ruta": "/api/v1/usuarios",
+      "authorization": "Bearer [OMITIDO]",
+      "solicitud": null,
+      "esperado": 403,
+      "http": 403,
+      "resultado": "OK",
+      "respuesta": {
+        "timestamp": "2026-10-09T21:31:30.194209",
+        "mensaje": "Permiso insuficiente",
+        "detalles": "FORBIDDEN"
+      }
+    },
+    {
+      "caso": "Administrador elimina usuario de prueba",
+      "metodo": "DELETE",
+      "ruta": "/api/v1/usuarios/2",
+      "authorization": "Bearer [OMITIDO]",
+      "solicitud": null,
+      "esperado": 204,
+      "http": 204,
+      "resultado": "OK",
+      "respuesta": ""
+    },
+    {
+      "caso": "Token de usuario eliminado es rechazado",
+      "metodo": "GET",
+      "ruta": "/api/v1/productos",
+      "authorization": "Bearer [OMITIDO]",
+      "solicitud": null,
+      "esperado": 401,
+      "http": 401,
+      "resultado": "OK",
+      "respuesta": {
+        "status": 401,
+        "mensaje": "Token inválido, expirado o usuario no habilitado"
+      }
+    },
+    {
+      "caso": "Crear producto para comprobar eliminación",
+      "metodo": "POST",
+      "ruta": "/api/v1/productos",
+      "authorization": "Bearer [OMITIDO]",
+      "solicitud": {
+        "codigo": "T-317601",
+        "nombre": "Producto actualizado",
+        "unidadMedida": "caja",
+        "stockMinimo": 10,
+        "categoriaId": 1
+      },
+      "esperado": 201,
+      "http": 201,
+      "resultado": "OK",
+      "respuesta": {
+        "id": 3,
+        "codigo": "T-317601",
+        "nombre": "Producto actualizado",
+        "unidadMedida": "caja",
+        "stockMinimo": 10,
+        "categoriaId": 1,
+        "categoria": "Bebidas-317601"
+      }
+    },
+    {
+      "caso": "Eliminar producto sin referencias",
+      "metodo": "DELETE",
+      "ruta": "/api/v1/productos/3",
+      "authorization": "Bearer [OMITIDO]",
+      "solicitud": null,
+      "esperado": 204,
+      "http": 204,
+      "resultado": "OK",
+      "respuesta": ""
+    },
+    {
+      "caso": "Registro eliminado retorna 404",
+      "metodo": "GET",
+      "ruta": "/api/v1/productos/3",
+      "authorization": "Bearer [OMITIDO]",
+      "solicitud": null,
+      "esperado": 404,
+      "http": 404,
+      "resultado": "OK",
+      "respuesta": {
+        "timestamp": "2026-10-09T21:31:30.315014",
+        "mensaje": "Registro no encontrado: 3",
+        "detalles": "NOT_FOUND"
+      }
+    },
+    {
+      "caso": "Rechazar eliminación de producto con historial",
+      "metodo": "DELETE",
+      "ruta": "/api/v1/productos/1",
+      "authorization": "Bearer [OMITIDO]",
+      "solicitud": null,
+      "esperado": 409,
+      "http": 409,
+      "resultado": "OK",
+      "respuesta": {
+        "timestamp": "2026-10-09T21:31:30.340896",
+        "mensaje": "La operación contradice una regla de integridad o de negocio",
+        "detalles": "CONFLICT"
+      }
+    }
+  ],
+  "total": 36,
+  "correctos": 36
+}
