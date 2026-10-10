@@ -46,7 +46,7 @@ public class RolServiceImpl implements RolService {
     @Override
     @Transactional
     public RolResponseDTO crear(RolRequestDTO request) {
-        if (rolRepository.existsByNombre(request.getNombre())) {
+        if (rolRepository.existsByNombre(request.getNombre().toUpperCase(java.util.Locale.ROOT))) {
             throw new IllegalArgumentException("Ya existe un rol con el nombre: " + request.getNombre());
         }
 
@@ -69,7 +69,7 @@ public class RolServiceImpl implements RolService {
                 .orElseThrow(() -> new ResourceNotFoundException("Rol no encontrado con id: " + id));
 
         if (request.getNombre() != null && !request.getNombre().equalsIgnoreCase(rol.getNombre())) {
-            if (rolRepository.existsByNombre(request.getNombre())) {
+            if (rolRepository.existsByNombre(request.getNombre().toUpperCase(java.util.Locale.ROOT))) {
                 throw new IllegalArgumentException("Ya existe un rol con el nombre: " + request.getNombre());
             }
             rol.setNombre(request.getNombre().toUpperCase());
@@ -114,7 +114,9 @@ public class RolServiceImpl implements RolService {
         if (permisoIds == null || permisoIds.isEmpty()) {
             return new HashSet<>();
         }
-        return new HashSet<>(permisoRepository.findAllById(permisoIds));
+        var encontrados = permisoRepository.findAllById(permisoIds);
+        if (encontrados.size() != permisoIds.size()) throw new IllegalArgumentException("Uno o más permisos no existen");
+        return new HashSet<>(encontrados);
     }
 
     private RolResponseDTO mapearADTO(Rol rol) {

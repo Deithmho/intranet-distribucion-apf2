@@ -55,15 +55,8 @@ public class JwtTokenProvider {
                     .build()
                     .parseSignedClaims(token);
             return true;
-        } catch (MalformedJwtException ex) {
-            System.err.println("Token JWT inválido");
-        } catch (ExpiredJwtException ex) {
-            System.err.println("Token JWT expirado");
-        } catch (UnsupportedJwtException ex) {
-            System.err.println("Token JWT no soportado");
-        } catch (IllegalArgumentException ex) {
-            System.err.println("El claims JWT está vacío");
+        } catch (JwtException | IllegalArgumentException ex) {
+            return false;
         }
-        return false;
     }
 }

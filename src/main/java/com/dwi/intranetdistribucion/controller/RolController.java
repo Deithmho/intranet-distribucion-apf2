@@ -5,12 +5,15 @@ import com.dwi.intranetdistribucion.dto.response.PermisoResponseDTO;
 import com.dwi.intranetdistribucion.dto.response.RolResponseDTO;
 import com.dwi.intranetdistribucion.service.RolService;
 import lombok.RequiredArgsConstructor;
+import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@PreAuthorize("hasAuthority('ROLES_GESTIONAR')")
 @RestController
 @RequestMapping("/api/v1/roles")
 @RequiredArgsConstructor
@@ -29,14 +32,14 @@ public class RolController {
     }
 
     @PostMapping
-    public ResponseEntity<RolResponseDTO> crear(@RequestBody RolRequestDTO request) {
+    public ResponseEntity<RolResponseDTO> crear(@Valid @RequestBody RolRequestDTO request) {
         return new ResponseEntity<>(rolService.crear(request), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<RolResponseDTO> actualizar(
             @PathVariable Long id,
-            @RequestBody RolRequestDTO request) {
+            @Valid @RequestBody RolRequestDTO request) {
         return ResponseEntity.ok(rolService.actualizar(id, request));
     }
 

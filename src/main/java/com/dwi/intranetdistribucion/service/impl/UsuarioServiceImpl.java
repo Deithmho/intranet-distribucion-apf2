@@ -1,90 +1,40 @@
 package com.dwi.intranetdistribucion.service.impl;
-
 import com.dwi.intranetdistribucion.dto.request.UsuarioRequestDTO;
 import com.dwi.intranetdistribucion.dto.response.UsuarioResponseDTO;
 import com.dwi.intranetdistribucion.exception.ResourceNotFoundException;
 import com.dwi.intranetdistribucion.model.Usuario;
-import com.dwi.intranetdistribucion.repository.UsuarioRepository;
+import com.dwi.intranetdistribucion.repository.*;
 import com.dwi.intranetdistribucion.service.UsuarioService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
-import java.util.stream.Collectors;
-
-import org.springframework.security.crypto.password.PasswordEncoder;
-
-@Service
-@RequiredArgsConstructor
+@Service @RequiredArgsConstructor @Transactional(readOnly=true)
 public class UsuarioServiceImpl implements UsuarioService {
-
-    private final UsuarioRepository usuarioRepository;
-    private final PasswordEncoder passwordEncoder;
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<UsuarioResponseDTO> obtenerTodos() {
-        return usuarioRepository.findAll().stream()
-                .map(this::mapearADTO)
-                .collect(Collectors.toList());
+    private final UsuarioRepository usuarios;
+    private final RolRepository roles;
+    private final PasswordEncoder encoder;
+    public List<UsuarioResponseDTO> obtenerTodos() { return usuarios.findAll().stream().map(this::dto).toList(); }
+    public UsuarioResponseDTO obtenerPorId(Long id) { return dto(buscar(id)); }
+    @Transactional public UsuarioResponseDTO crear(UsuarioRequestDTO r) {
+        var user = new Usuario(); aplicar(user,r); return dto(usuarios.save(user));
     }
-
-    @Override
-    @Transactional(readOnly = true)
-    public UsuarioResponseDTO obtenerPorId(Long id) {
-        Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con id: " + id));
-        return mapearADTO(usuario);
+    @Transactional public UsuarioResponseDTO actualizar(Long id, UsuarioRequestDTO r) {
+        var user=buscar(id); aplicar(user,r); return dto(usuarios.save(user));
     }
-
-    @Override
-    @Transactional
-    public UsuarioResponseDTO crear(UsuarioRequestDTO request) {
-        if (usuarioRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("El email ya se encuentra registrado");
-        }
-
-        Usuario usuario = Usuario.builder()
-                .nombre(request.getNombre())
-                .apellido(request.getApellido())
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .build();
-
-        Usuario guardado = usuarioRepository.save(usuario);
-        return mapearADTO(guardado);
+    @Transactional public void eliminar(Long id) { usuarios.delete(buscar(id)); }
+    private Usuario buscar(Long id) { return usuarios.findById(id).orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado")); }
+    private void aplicar(Usuario u, UsuarioRequestDTO r) {
+        String email=r.getEmail().trim().toLowerCase(java.util.Locale.ROOT);
+        usuarios.findByEmail(email).ifPresent(v -> { if (!v.getId().equals(u.getId())) throw new IllegalStateException("Correo duplicado"); });
+        u.setNombre(r.getNombre().trim());u.setApellido(r.getApellido().trim());u.setEmail(email);
+        u.setPassword(encoder.encode(r.getPassword()));
+        u.setRol(roles.findById(r.getRolId()).orElseThrow(() -> new ResourceNotFoundException("Rol no encontrado")));
+        u.setEsActivo(r.getEsActivo()==null || r.getEsActivo());
     }
-
-    @Override
-    @Transactional
-    public UsuarioResponseDTO actualizar(Long id, UsuarioRequestDTO request) {
-        Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con id: " + id));
-
-        usuario.setNombre(request.getNombre());
-        usuario.setApellido(request.getApellido());
-
-        Usuario actualizado = usuarioRepository.save(usuario);
-        return mapearADTO(actualizado);
-    }
-
-    @Override
-    @Transactional
-    public void eliminar(Long id) {
-        Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con id: " + id));
-        usuarioRepository.delete(usuario);
-    }
-
-    private UsuarioResponseDTO mapearADTO(Usuario usuario) {
-        return UsuarioResponseDTO.builder()
-                .id(usuario.getId())
-                .nombre(usuario.getNombre())
-                .apellido(usuario.getApellido())
-                .email(usuario.getEmail())
-                .esActivo(usuario.getEsActivo())
-                .fechaCreacion(usuario.getFechaCreacion())
-                .build();
+    private UsuarioResponseDTO dto(Usuario u) {
+        return UsuarioResponseDTO.builder().id(u.getId()).nombre(u.getNombre()).apellido(u.getApellido()).email(u.getEmail())
+            .esActivo(u.getEsActivo()).fechaCreacion(u.getFechaCreacion()).rolId(u.getRol().getId()).rolNombre(u.getRol().getNombre()).build();
     }
 }
