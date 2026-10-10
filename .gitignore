@@ -39,3 +39,9 @@ out/
 ### Environment Variables ###
 .env
 
+
+# Evidencias locales con datos sensibles
+.env.*
+!.env.example
+*.log
+postman/*local*.json
