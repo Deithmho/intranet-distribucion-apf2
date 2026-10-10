@@ -488,7 +488,7 @@
             "type": "text/javascript",
             "exec": [
               "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
-              "pm.test(\"Destino conserva 7 unidades\", () => pm.expect(pm.response.json().find(x => String(x.productoId) === pm.environment.get(\"productoId\")).cantidad).to.eql(7));"
+              "pm.test(\"Destino conserva 7 unidades\", () => pm.expect(pm.response.json().find(x => String(x.productoId) === String(pm.environment.get(\"productoId\"))).cantidad).to.eql(7));"
             ]
           }
         }
@@ -556,7 +556,7 @@
             "type": "text/javascript",
             "exec": [
               "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
-              "pm.test(\"Rollback conserva 13 unidades\", () => pm.expect(pm.response.json().find(x => String(x.productoId) === pm.environment.get(\"productoId\")).cantidad).to.eql(13));"
+              "pm.test(\"Rollback conserva 13 unidades\", () => pm.expect(pm.response.json().find(x => String(x.productoId) === String(pm.environment.get(\"productoId\"))).cantidad).to.eql(13));"
             ]
           }
         }

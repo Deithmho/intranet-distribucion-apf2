@@ -1,0 +1,7 @@
+{
+  "fecha": "2026-10-10T02:44:23.102Z",
+  "herramienta": "Newman 6.2.3",
+  "requests": 22,
+  "assertions": 24,
+  "failures": 0
+}

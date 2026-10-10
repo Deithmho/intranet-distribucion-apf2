@@ -108,7 +108,7 @@ docker compose exec -T db psql -U intranet -d intranet -f - < scripts/evidencia-
 
 ## Postman
 
-Importa `postman/APF2.postman_collection.json` y `postman/APF2.postman_environment.json`. Selecciona el entorno APF2 local y completa `adminPassword` con tu valor local. Ejecuta la colección en orden con Collection Runner. El login guarda el token y las respuestas guardan los IDs de cada registro. La colección incluye pruebas de HTTP y rollback; las contraseñas y tokens no tienen valores exportados.
+Importa `postman/APF2.postman_collection.json` y `postman/APF2.postman_environment.json`. Selecciona el entorno APF2 local y completa `adminPassword` con tu valor local. Ejecuta la colección en orden con Collection Runner. El login guarda el token y las respuestas guardan los IDs de cada registro. La colección incluye pruebas de HTTP y rollback; las contraseñas y tokens no tienen valores exportados. Su ejecución con Newman 6.2.3 completó 22 solicitudes y 24 comprobaciones sin fallos.
 
 ## Detener el entorno
 

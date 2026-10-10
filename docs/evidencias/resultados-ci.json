@@ -1,0 +1,7 @@
+{
+  "workflow": "Validaci\u00f3n APF2",
+  "runId": 38017439753,
+  "resultado": "success",
+  "url": "https://github.com/Deithmho/intranet-distribucion-apf2/actions/runs/38017439753",
+  "validacion": "./gradlew clean test bootJar --no-daemon"
+}
