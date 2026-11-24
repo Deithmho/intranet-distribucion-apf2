@@ -1,0 +1,44 @@
+DIAPOSITIVA 1
+Curso Integrador II Sistemas. Docente Mgtr. César Augusto Cárdenas Latorre. Sección 60618. Estudiante Mathias Sebastian Herrera Gutierrez, U23263869. Fecha 24 de noviembre de 2026. Exposición individual del caso académico. Presentar el alcance backend y distinguir el despliegue local de producción corporativa.
+
+DIAPOSITIVA 2
+Caso académico Backus. Se conserva el alcance backend del APF2. No se afirma operación de sistemas reales de la empresa. Los módulos de pedidos, flota, rutas y frontend no forman parte de la versión 0.3.0.
+
+DIAPOSITIVA 3
+Evidencias: docs/apf3/evidencias/funcionales.json, postgresql.txt e integracion-ci.json. El borrado conserva filas e impide nuevas operaciones sobre registros archivados.
+
+DIAPOSITIVA 4
+PostgreSQL local conserva 51 productos, uno inactivo, y dos almacenes, uno inactivo. Access token 15 minutos. Refresh con expiración absoluta de 7 días. Logout revoca renovación; un access token emitido puede vivir hasta su vencimiento mientras la cuenta siga habilitada. Fuente técnica: https://www.rfc-editor.org/rfc/rfc9700.html
+
+DIAPOSITIVA 5
+Se utiliza la retrospectiva como revisión individual, sin inventar un equipo Scrum ni reuniones anteriores. Acciones: conservar scripts, ampliar pruebas de carga sostenida y separar revisión/aprobación en una futura operación. Marco: https://scrumguides.org/docs/scrumguide/v2020/2020-Scrum-Guide-Spanish-Latin-South-American.pdf
+
+DIAPOSITIVA 6
+Horario propuesto lunes a viernes de 09:00 a 18:00, hora de Perú. Una interrupción es incidente; una modificación de funcionalidad requiere RFC. Fuentes del proyecto: catálogo del informe, .github/ISSUE_TEMPLATE/solicitud-servicio.yml.
+
+DIAPOSITIVA 7
+Los tres registros son ejercicios académicos ejecutados, no solicitudes de clientes reales. SOL-002 verificó alta 201, lectura 200 y escritura 403. Se requiere separar autorización y ejecución al incorporar más personas.
+
+DIAPOSITIVA 8
+RFC-001 soft delete; RFC-002 refresh; RFC-003 Swagger; RFC-004 Flyway; RFC-005 despliegue local. Cambios normales, estándar y de emergencia tienen registro y validación. No se ejecuta Flyway clean ni se borran volúmenes para revertir.
+
+DIAPOSITIVA 9
+Ejecución final del código verificada: https://github.com/Deithmho/intranet-distribucion-apf2/actions/runs/45399447561. Commit d409a61. 22 pruebas, cero fallos y cero omitidas. Comando ./gradlew clean test bootJar --no-daemon. Fuentes: integracion-final.json y reporte HTML del workflow. Referencia: https://docs.github.com/en/actions/get-started/understand-github-actions
+
+DIAPOSITIVA 10
+Fuente: docs/apf3/evidencias/rendimiento.json. macOS 15.7.3 ARM64, ocho núcleos lógicos, PostgreSQL 17.12, HTTP local sin pool persistente en el cliente. Rutas: productos, inventario, movimientos y categorías. No mide capacidad productiva certificada.
+
+DIAPOSITIVA 11
+Cada fase dura aproximadamente 15 s. p95 no aumenta de forma monotónica: pueden influir calentamiento JIT y cachés. Los datos no demuestran que más usuarios mejoren el sistema. CPU y RSS no incluyen el total de PostgreSQL o del equipo. Fuente: rendimiento.json.
+
+DIAPOSITIVA 12
+Plan inicial de piloto sujeto a medición: 2 vCPU, 2 GiB RAM y 10 GiB de almacenamiento. Proyección: N usuarios registrados × 25% activos × 0.2 solicitudes/s, con pico de tres veces. Para 100, 250 y 500 registrados: picos supuestos de 15, 37.5 y 75 RPS. No confundir estos supuestos con mediciones reales.
+
+DIAPOSITIVA 13
+El entorno académico verificado usa procesos nativos en loopback. Dockerfile y compose.apf3.yml se entregan como alternativa pendiente de validación local. No existe URL ni certificado público. Una publicación externa requerirá servidor, TLS, secretos y monitoreo.
+
+DIAPOSITIVA 14
+Captura real de http://127.0.0.1:8083/swagger-ui/index.html, 24/11/2026. La interfaz pública de documentación no sustituye los permisos de la API. Para probar operaciones protegidas se utiliza accessToken de la instalación local, sin publicarlo. OpenAPI: https://springdoc.org/
+
+DIAPOSITIVA 15
+Respaldo pg_dump y restauración en base temporal: 0.357 s con dataset pequeño, resultado correcto. RPO de 24 h y RTO de 60 min son objetivos propuestos, no garantías verificadas a escala productiva. La versión final corresponde al incremento backend APF3. Pedidos, flota, rutas, facturación y Angular siguen fuera del incremento. Repositorio individual: https://github.com/Deithmho/intranet-distribucion-apf2/tree/avance/apf3-gestion-servicio

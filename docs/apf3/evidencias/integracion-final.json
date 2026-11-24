@@ -1,0 +1,9 @@
+{
+  "run_id": 45399447561,
+  "url": "https://github.com/Deithmho/intranet-distribucion-apf2/actions/runs/45399447561",
+  "commit": "d409a612fadf82b7cb7758f7ed2c10efb824bdcc",
+  "tests": 22,
+  "failures": 0,
+  "skipped": 0,
+  "resultado": "success"
+}

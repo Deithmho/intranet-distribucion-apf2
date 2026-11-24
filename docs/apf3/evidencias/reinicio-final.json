@@ -1,0 +1,11 @@
+{
+  "fecha": "2026-11-24T13:10:54.520732+00:00",
+  "estado": 200,
+  "productos_activos_tras_reinicio": 50,
+  "movimientos_tras_reinicio": 51,
+  "refresh": 200,
+  "replay": 401,
+  "descendiente_revocado": 401,
+  "bind_api": "127.0.0.1:8083",
+  "jar_sha256": "a1d17b2aa0a1830df3413e05882578504d81df1ab0a49af79b066bd734dabca8"
+}

@@ -17,6 +17,7 @@ services:
   api:
     build: .
     environment:
+      SERVER_ADDRESS: 0.0.0.0
       DB_URL: jdbc:postgresql://db:5432/intranet
       DB_USERNAME: ${DB_USERNAME:-intranet}
       DB_PASSWORD: ${DB_PASSWORD}

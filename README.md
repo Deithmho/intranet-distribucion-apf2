@@ -2,7 +2,7 @@
 
 Continuación individual para **Curso Integrador II: Sistemas**, sección **60618**. Mathias Sebastian Herrera Gutierrez, **U23263869**. Docente **Mgtr. César Augusto Cárdenas Latorre**.
 
-La versión **0.3.0** atiende las cuatro observaciones del APF2: soft delete, refresh tokens, Swagger Bearer y migraciones Flyway. Ver [notas de versión](docs/apf3/CHANGELOG.md) y [gestión de cambios](docs/apf3/CONTROL_DE_CAMBIOS.md).
+La versión **0.3.0** atiende las cuatro observaciones del APF2: soft delete, refresh tokens, Swagger Bearer y migraciones Flyway. Ver [entrega completa del APF3](docs/apf3/README.md), [notas de versión](docs/apf3/CHANGELOG.md) y [gestión de cambios](docs/apf3/CONTROL_DE_CAMBIOS.md).
 
 ## Despliegue APF3 verificado
 
