@@ -26,7 +26,7 @@ public class CatalogoServiceImpl implements CatalogoService {
     public List<AlmacenView> almacenes() { return almacenes.findAll().stream().map(AlmacenView::from).toList(); }
     public AlmacenView almacen(Long id) { return AlmacenView.from(obtener(almacenes,id)); }
     @Transactional public AlmacenView guardarAlmacen(Long id,AlmacenRequest r) { var x=id==null ? new Almacen() : obtener(almacenes,id);x.setCodigo(r.codigo().trim().toUpperCase());x.setNombre(r.nombre().trim());x.setSede(obtener(sedes,r.sedeId()));return AlmacenView.from(almacenes.saveAndFlush(x)); }
-    @Transactional public void eliminarAlmacen(Long id) { var x=obtener(almacenes,id);if(existencias.existsByAlmacenId(id)||movimientos.existsByOrigenIdOrDestinoId(id,id))throw new IllegalStateException("Almacén con inventario o historial");almacenes.delete(x); }
+    @Transactional public void eliminarAlmacen(Long id) { var x=obtener(almacenes,id);almacenes.delete(x); }
     public List<CategoriaView> categorias() { return categorias.findAll().stream().map(CategoriaView::from).toList(); }
     public CategoriaView categoria(Long id) { return CategoriaView.from(obtener(categorias,id)); }
     @Transactional public CategoriaView guardarCategoria(Long id,CategoriaRequest r) { var x=id==null ? new Categoria() : obtener(categorias,id);x.setNombre(r.nombre().trim());x.setDescripcion(r.descripcion());return CategoriaView.from(categorias.saveAndFlush(x)); }
@@ -34,5 +34,5 @@ public class CatalogoServiceImpl implements CatalogoService {
     public List<ProductoView> productos(Long categoriaId,String texto) { return productos.buscar(categoriaId,texto).stream().map(ProductoView::from).toList(); }
     public ProductoView producto(Long id) { return ProductoView.from(obtener(productos,id)); }
     @Transactional public ProductoView guardarProducto(Long id,ProductoRequest r) { var x=id==null ? new Producto() : obtener(productos,id);x.setCodigo(r.codigo().trim().toUpperCase());x.setNombre(r.nombre().trim());x.setUnidadMedida(r.unidadMedida().trim());x.setStockMinimo(r.stockMinimo());x.setCategoria(obtener(categorias,r.categoriaId()));return ProductoView.from(productos.saveAndFlush(x)); }
-    @Transactional public void eliminarProducto(Long id) { var x=obtener(productos,id);if(existencias.existsByProductoId(id)||movimientos.existsByProductoId(id))throw new IllegalStateException("Producto con inventario o historial");productos.delete(x); }
+    @Transactional public void eliminarProducto(Long id) { var x=obtener(productos,id);productos.delete(x); }
 }

@@ -30,6 +30,8 @@ class IntranetDistribucionBackApplicationTests {
         r.add("spring.datasource.url",POSTGRES::getJdbcUrl);r.add("spring.datasource.username",POSTGRES::getUsername);r.add("spring.datasource.password",POSTGRES::getPassword);
         r.add("app.jwt.secret",() -> Base64.getEncoder().encodeToString(KEY));r.add("app.bootstrap.enabled",() -> true);r.add("app.bootstrap.email",() -> "admin@example.test");r.add("app.bootstrap.password",() -> PASSWORD);
     }
+    @Autowired org.springframework.jdbc.core.JdbcTemplate jdbc;
+    @Autowired org.flywaydb.core.Flyway flyway;
     @Autowired MockMvc mvc;
     @Autowired ObjectMapper json;
     @Autowired UsuarioRepository users;
@@ -74,7 +76,7 @@ class IntranetDistribucionBackApplicationTests {
         mvc.perform(put("/api/v1/almacenes/"+w[0]).header("Authorization","Bearer "+token).contentType("application/json").content(json.writeValueAsString(Map.of("codigo","A-"+suffix,"nombre","Actualizado","sedeId",w[2])))).andExpect(status().isOk());
         mvc.perform(delete("/api/v1/almacenes/"+w[0]).header("Authorization","Bearer "+token)).andExpect(status().isNoContent());
         mvc.perform(delete("/api/v1/almacenes/"+w[1]).header("Authorization","Bearer "+token)).andExpect(status().isNoContent());
-        mvc.perform(delete("/api/v1/sedes/"+w[2]).header("Authorization","Bearer "+token)).andExpect(status().isNoContent());
+        mvc.perform(delete("/api/v1/sedes/"+w[2]).header("Authorization","Bearer "+token)).andExpect(status().isConflict());
     }
     @Test void missingTokenAndPublicStatus() throws Exception {
         mvc.perform(get("/api/v1/productos")).andExpect(status().isUnauthorized());
@@ -144,5 +146,70 @@ class IntranetDistribucionBackApplicationTests {
         mvc.perform(put("/api/v1/usuarios/"+id).header("Authorization","Bearer "+token).contentType("application/json").content(json.writeValueAsString(Map.of("nombre","Editado","apellido","Prueba","email","crud-"+suffix+"@example.test","password",PASSWORD,"rolId",roles.findByNombre("AUDITOR").orElseThrow().getId())))).andExpect(status().isOk());
         mvc.perform(delete("/api/v1/usuarios/"+id).header("Authorization","Bearer "+token)).andExpect(status().isNoContent());
         mvc.perform(post("/api/v1/roles").header("Authorization","Bearer "+token).contentType("application/json").content(json.writeValueAsString(Map.of("nombre","PRUEBA","permisoIds",List.of(Long.MAX_VALUE))))).andExpect(status().isBadRequest());
+    }
+
+    JsonNode credentials(String email) throws Exception {
+        return json.readTree(mvc.perform(post("/api/v1/auth/login").contentType("application/json").content(json.writeValueAsString(Map.of("email",email,"password",PASSWORD)))).andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
+    }
+    ResultActions refresh(String value) throws Exception {
+        return mvc.perform(post("/api/v1/auth/refresh").contentType("application/json").content(json.writeValueAsString(Map.of("refreshToken",value))));
+    }
+    @Test void softDeletePreservesRowsStockAndHistoricalApi() throws Exception {
+        long p=product(category());long[] w=warehouses();
+        inventory.entrada(new EntradaRequest(p,w[0],10,"Histórico conservado"),"admin@example.test");
+        mvc.perform(delete("/api/v1/productos/"+p).header("Authorization","Bearer "+token)).andExpect(status().isNoContent());
+        mvc.perform(delete("/api/v1/almacenes/"+w[0]).header("Authorization","Bearer "+token)).andExpect(status().isNoContent());
+        assertThat(jdbc.queryForObject("select activo from productos where id=?",Boolean.class,p)).isFalse();
+        assertThat(jdbc.queryForObject("select activo from almacenes where id=?",Boolean.class,w[0])).isFalse();
+        assertThat(jdbc.queryForObject("select cantidad from existencias where producto_id=? and almacen_id=?",Integer.class,p,w[0])).isEqualTo(10);
+        mvc.perform(get("/api/v1/productos/"+p).header("Authorization","Bearer "+token)).andExpect(status().isNotFound());
+        mvc.perform(get("/api/v1/almacenes/"+w[0]).header("Authorization","Bearer "+token)).andExpect(status().isNotFound());
+        var history=json.readTree(mvc.perform(get("/api/v1/inventario/movimientos").header("Authorization","Bearer "+token)).andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
+        assertThat(history.findValuesAsText("productoId")).contains(String.valueOf(p));
+        assertThatThrownBy(() -> inventory.entrada(new EntradaRequest(p,w[0],1,"No permitido"),"admin@example.test")).isInstanceOf(com.dwi.intranetdistribucion.exception.ResourceNotFoundException.class);
+    }
+    @Test void refreshRotatesAndReplayRevokesDescendant() throws Exception {
+        var initial=credentials("admin@example.test");String raw=initial.get("refreshToken").asText();
+        assertThat(initial.get("expiresIn").asLong()).isEqualTo(900);
+        assertThat(jdbc.queryForObject("select count(*) from refresh_tokens where token_hash=?",Long.class,raw)).isZero();
+        assertThat(jdbc.queryForObject("select count(*) from refresh_tokens where token_hash=?",Long.class,com.dwi.intranetdistribucion.service.RefreshTokenService.hash(raw))).isEqualTo(1);
+        var next=json.readTree(refresh(raw).andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
+        assertThat(next.get("refreshToken").asText()).isNotEqualTo(raw);
+        refresh(raw).andExpect(status().isUnauthorized());
+        refresh(next.get("refreshToken").asText()).andExpect(status().isUnauthorized());
+    }
+    @Test void logoutRevokesRefreshFamily() throws Exception {
+        String raw=credentials("admin@example.test").get("refreshToken").asText();
+        mvc.perform(post("/api/v1/auth/logout").contentType("application/json").content(json.writeValueAsString(Map.of("refreshToken",raw)))).andExpect(status().isNoContent());
+        refresh(raw).andExpect(status().isUnauthorized());
+    }
+    @Test void expiredRefreshIsRejected() throws Exception {
+        String raw=credentials("admin@example.test").get("refreshToken").asText();
+        jdbc.update("update refresh_tokens set expires_at=now()-interval '1 second' where token_hash=?",com.dwi.intranetdistribucion.service.RefreshTokenService.hash(raw));
+        refresh(raw).andExpect(status().isUnauthorized());
+    }
+    @Test void inactiveAccountCannotRefresh() throws Exception {
+        String email="refresh-"+suffix+"@example.test";long id=user(email,"AUDITOR");String raw=credentials(email).get("refreshToken").asText();
+        jdbc.update("update usuarios set es_activo=false where id=?",id);
+        refresh(raw).andExpect(status().isUnauthorized());
+    }
+    @Test void concurrentRefreshHasOneWinnerAndDetectsReplay() throws Exception {
+        String raw=credentials("admin@example.test").get("refreshToken").asText();
+        var pool=Executors.newFixedThreadPool(2);var latch=new CountDownLatch(1);
+        Callable<Integer> action=()->{latch.await();return refresh(raw).andReturn().getResponse().getStatus();};
+        try {var a=pool.submit(action);var b=pool.submit(action);latch.countDown();assertThat(List.of(a.get(20,TimeUnit.SECONDS),b.get(20,TimeUnit.SECONDS))).containsExactlyInAnyOrder(200,401);}finally{pool.shutdownNow();}
+    }
+    @Test void swaggerDefinesGlobalBearerAndAnonymousLogin() throws Exception {
+        mvc.perform(get("/swagger-ui/index.html")).andExpect(status().isOk());
+        mvc.perform(get("/v3/api-docs")).andExpect(status().isOk())
+            .andExpect(jsonPath("$.components.securitySchemes.bearerAuth.scheme").value("bearer"))
+            .andExpect(jsonPath("$.components.securitySchemes.bearerAuth.bearerFormat").value("JWT"))
+            .andExpect(jsonPath("$.security[0].bearerAuth").exists());
+    }
+    @Test void flywayAppliedVersionedMigrationsAndIsRepeatable() {
+        assertThat(flyway.info().applied()).hasSize(3);
+        flyway.validate();flyway.migrate();
+        assertThat(flyway.info().applied()).hasSize(3);
+        assertThat(jdbc.queryForObject("select count(*) from roles",Integer.class)).isGreaterThanOrEqualTo(3);
     }
 }

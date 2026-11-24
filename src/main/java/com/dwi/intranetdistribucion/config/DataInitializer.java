@@ -24,13 +24,6 @@ public class DataInitializer implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) {
-        for (String nombre : List.of("USUARIOS_VER", "USUARIOS_CREAR", "ROLES_GESTIONAR", "INVENTARIO_VER", "INVENTARIO_GESTIONAR")) {
-            if (!permisos.existsByNombre(nombre)) permisos.save(Permiso.builder()
-                .nombre(nombre).descripcion(nombre.replace('_', ' ')).modulo(nombre.startsWith("INVENTARIO") ? "INVENTARIO" : "SEGURIDAD").build());
-        }
-        crearRol("ADMIN", permisos.findAll());
-        crearRol("ALMACENERO", List.of(permisos.findByNombre("INVENTARIO_VER").orElseThrow(), permisos.findByNombre("INVENTARIO_GESTIONAR").orElseThrow()));
-        crearRol("AUDITOR", List.of(permisos.findByNombre("INVENTARIO_VER").orElseThrow()));
         if (enabled && !usuarios.existsByEmail(email)) {
             if (password.length() < 12) throw new IllegalArgumentException("ADMIN_PASSWORD debe tener al menos 12 caracteres");
             usuarios.save(Usuario.builder().nombre("Administrador").apellido("Académico").email(email)

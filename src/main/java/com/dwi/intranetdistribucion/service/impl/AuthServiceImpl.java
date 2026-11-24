@@ -14,6 +14,7 @@ public class AuthServiceImpl implements AuthService {
     private final UsuarioRepository usuarios;
     private final JwtTokenProvider tokens;
     private final UsuarioService userService;
+    private final RefreshTokenService refresh;
     @Transactional(noRollbackFor={BadCredentialsException.class, LockedException.class})
     public JwtAuthResponseDTO login(LoginRequestDTO r) {
         String email=r.getEmail().trim().toLowerCase(java.util.Locale.ROOT);
@@ -22,7 +23,7 @@ public class AuthServiceImpl implements AuthService {
         try {
             var auth=manager.authenticate(new UsernamePasswordAuthenticationToken(email,r.getPassword()));
             u.setIntentosFallidos(0);
-            return JwtAuthResponseDTO.builder().accessToken(tokens.generarToken(auth)).tokenType("Bearer").build();
+            return refresh.emitir(u,auth);
         } catch (BadCredentialsException ex) {
             int count=u.getIntentosFallidos()+1;u.setIntentosFallidos(count);
             if(count>=5) {u.setEsBloqueado(true);throw new LockedException("Cuenta bloqueada tras cinco intentos fallidos");}

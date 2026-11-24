@@ -1,11 +1,14 @@
 package com.dwi.intranetdistribucion.model;
 import jakarta.persistence.*;
 import lombok.*;
+@org.hibernate.annotations.SQLDelete(sql="UPDATE productos SET activo = false WHERE id = ?")
+@org.hibernate.annotations.SQLRestriction("activo = true")
 @Entity
 @Table(name="productos")
 @org.hibernate.annotations.Check(constraints="stock_minimo >= 0")
 @Getter @Setter @NoArgsConstructor
 public class Producto {
+    @Column(nullable=false) private boolean activo = true;
     @Id @GeneratedValue(strategy=GenerationType.IDENTITY) private Long id;
     @Column(nullable=false,unique=true,length=30) private String codigo;
     @Column(nullable=false,length=120) private String nombre;

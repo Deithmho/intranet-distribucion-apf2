@@ -18,7 +18,16 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+    private final com.dwi.intranetdistribucion.service.RefreshTokenService refresh;
+    @io.swagger.v3.oas.annotations.security.SecurityRequirements
+    @PostMapping("/refresh")
+    public JwtAuthResponseDTO renovar(@Valid @RequestBody com.dwi.intranetdistribucion.dto.request.RefreshRequest request) { return refresh.renovar(request.refreshToken()); }
+    @io.swagger.v3.oas.annotations.security.SecurityRequirements
+    @PostMapping("/logout")
+    public ResponseEntity<Void> cerrar(@Valid @RequestBody com.dwi.intranetdistribucion.dto.request.RefreshRequest request) { refresh.cerrar(request.refreshToken());return ResponseEntity.noContent().build(); }
 
+
+    @io.swagger.v3.oas.annotations.security.SecurityRequirements
     @PostMapping("/login")
     public ResponseEntity<JwtAuthResponseDTO> login(@Valid @RequestBody LoginRequestDTO loginRequestDTO) {
         JwtAuthResponseDTO response = authService.login(loginRequestDTO);

@@ -16,7 +16,7 @@ public class InventarioServiceImpl implements InventarioService {
     private final ExistenciaRepository existencias;
     private final MovimientoRepository movimientos;
     public List<ExistenciaView> consultar(Long almacenId,Long categoriaId,boolean critico) { return existencias.buscar(almacenId,categoriaId,critico).stream().map(ExistenciaView::from).toList(); }
-    public List<MovimientoView> movimientos() { return movimientos.findAll().stream().map(MovimientoView::from).toList(); }
+    public List<MovimientoView> movimientos() { return movimientos.historico().stream().map(x -> new MovimientoView(x.getId(),x.getProductoId(),x.getOrigenId(),x.getDestinoId(),x.getCantidad(),x.getTipo(),x.getMotivo(),x.getResponsable(),x.getFecha())).toList(); }
     @Transactional public MovimientoView entrada(EntradaRequest r,String responsable) {
         Producto producto=bloquear(r.productoId());Almacen destino=almacen(r.almacenId());
         Existencia stock=stock(producto,destino);stock.setCantidad(Math.addExact(stock.getCantidad(),r.cantidad()));existencias.save(stock);

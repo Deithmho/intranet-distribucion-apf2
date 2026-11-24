@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 @Builder
 public class JwtAuthResponseDTO {
     private String accessToken;
+    private String refreshToken;
+    private long expiresIn;
     @Builder.Default
     private String tokenType = "Bearer";
 }
