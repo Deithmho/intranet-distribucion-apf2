@@ -1,3 +1,41 @@
+# Intranet de distribución APF3
+
+Continuación individual para **Curso Integrador II: Sistemas**, sección **60618**. Mathias Sebastian Herrera Gutierrez, **U23263869**. Docente **Mgtr. César Augusto Cárdenas Latorre**.
+
+La versión **0.3.0** atiende las cuatro observaciones del APF2: soft delete, refresh tokens, Swagger Bearer y migraciones Flyway. Ver [notas de versión](docs/apf3/CHANGELOG.md) y [gestión de cambios](docs/apf3/CONTROL_DE_CAMBIOS.md).
+
+## Despliegue APF3 verificado
+
+Requisitos: Java 21, Python 3 estándar y PostgreSQL 17 (`initdb`, `pg_ctl`, `psql`, `createdb`). En macOS con Homebrew, instalar PostgreSQL 17 con `brew install postgresql@17`. En Linux, añadir sus binarios a PATH o definir PG_BIN.
+
+```bash
+python3 scripts/desplegar-local.py
+# En otra terminal, validación funcional y carga local
+python3 scripts/validar-apf3.py
+# Detener la API y la base aislada
+python3 scripts/desplegar-local.py --stop
+```
+
+API: http://127.0.0.1:8083. Swagger: http://127.0.0.1:8083/swagger-ui/index.html. La instalación genera `.env` privado y `.runtime/` ignorado. Usuario inicial en ADMIN_EMAIL y contraseña en ADMIN_PASSWORD del .env local. No compartir estos valores. El despliegue es académico local, sin dominio ni certificado público.
+
+Alternativa con Docker disponible: `bash scripts/configurar-entorno.sh` y `docker compose -f compose.apf3.yml up --build -d`. Su configuración se entrega, pero Docker Desktop no respondió en el equipo de validación, por lo que el despliegue medido es el nativo.
+
+## Migraciones y actualización de bases anteriores
+
+Una base vacía aplica V1, V2 y V3 automáticamente y Hibernate valida el resultado. Para una base APF2 existente: realizar pg_dump privado, restaurar una copia, comparar su esquema con V1, ejecutar **baseline manual en versión 1** mediante una instalación de Flyway configurada para esa copia y aplicar V2/V3. Repetir validación y recién entonces aprobar el cambio de la base original. `baseline-on-migrate=false` evita aceptar una base equivocada automáticamente. No utilizar ddl-auto=update ni clean.
+
+## Autenticación de la versión 0.3.0
+
+`POST /api/v1/auth/login` devuelve accessToken, refreshToken, tokenType y expiresIn. `POST /api/v1/auth/refresh` recibe refreshToken y lo reemplaza por otro. `POST /api/v1/auth/logout` revoca la familia de renovación. El servidor guarda solo SHA-256 del refresh, bloquea la cuenta al rotar y detecta reutilización. Un access token previamente emitido puede conservar vigencia hasta 15 minutos si la cuenta sigue habilitada. La familia de refresh dura 7 días absolutos.
+
+En Swagger, iniciar sesión con el administrador local, copiar accessToken y usar **Authorize**. Nunca guardar capturas con el JWT o contraseña visibles.
+
+El historial mantiene IDs de productos y almacenes archivados. El catálogo corriente y nuevos movimientos solo admiten registros activos. Los códigos archivados conservan su unicidad para evitar confundir identidades históricas.
+
+Las evidencias nuevas están en [docs/apf3/evidencias](docs/apf3/evidencias). La documentación siguiente corresponde a la línea base APF2 y se conserva como antecedente; ante diferencias, prevalece esta sección APF3.
+
+---
+
 # Intranet de distribución APF2
 
 Backend del proyecto académico **Implementación de una intranet para la gestión de distribución en una empresa Backus**. Continuación individual del avance 01 para el curso Desarrollo Web Integrado, enfocada en persistencia y seguridad.

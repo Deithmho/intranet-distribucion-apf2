@@ -1,0 +1,27 @@
+name: Solicitud de servicio
+description: Información, acceso, restablecimiento o consulta del inventario
+title: "[SOL] "
+labels: []
+body:
+  - type: dropdown
+    id: tipo
+    attributes:
+      label: Tipo
+      options: [Información, Acceso, Restablecimiento, Consulta]
+    validations:
+      required: true
+  - type: textarea
+    id: detalle
+    attributes:
+      label: Descripción y resultado esperado
+      description: No incluyas contraseñas, tokens ni datos personales de terceros.
+    validations:
+      required: true
+  - type: input
+    id: autorizacion
+    attributes:
+      label: Responsable que autoriza el acceso si corresponde
+  - type: textarea
+    id: cierre
+    attributes:
+      label: Evidencia de validación y cierre

@@ -1,0 +1,73 @@
+{
+  "fecha": "2026-11-24T12:55:27.466633+00:00",
+  "entorno": {
+    "os": "macOS-15.7.3-arm64-arm-64bit",
+    "arquitectura": "arm64",
+    "nucleos_logicos": 8,
+    "java_heap_max_mib": 512,
+    "postgresql_local": "17.12",
+    "base_url": "http://127.0.0.1:8083"
+  },
+  "metodologia": {
+    "carga": "cerrada de lectura autenticada",
+    "usuarios_virtuales": [
+      1,
+      10,
+      25
+    ],
+    "duracion_objetivo_s_por_fase": 15,
+    "pausa_s_por_usuario": 0.1,
+    "calentamiento": 20,
+    "rutas": [
+      "/api/v1/productos",
+      "/api/v1/inventario",
+      "/api/v1/inventario/movimientos",
+      "/api/v1/categorias"
+    ],
+    "conexiones_http": "urllib HTTP/1.1 sin pool persistente",
+    "cpu": "delta de tiempo CPU del proceso Java / duración; 100% = un núcleo",
+    "memoria": "RSS del proceso Java, muestreo cada 0.5 s",
+    "limitacion": "Prueba exploratoria corta, un único host y dataset pequeño. No mide producción corporativa, crecimiento sostenido ni saturación."
+  },
+  "fases": [
+    {
+      "usuarios_virtuales": 1,
+      "duracion_s": 15.06,
+      "solicitudes": 133,
+      "errores": 0,
+      "error_pct": 0.0,
+      "rps": 8.83,
+      "p50_ms": 9.54,
+      "p95_ms": 12.07,
+      "p99_ms": 22.8,
+      "cpu_api_pct_un_nucleo": 15.2,
+      "rss_api_max_mib": 323.69
+    },
+    {
+      "usuarios_virtuales": 10,
+      "duracion_s": 15.03,
+      "solicitudes": 1351,
+      "errores": 0,
+      "error_pct": 0.0,
+      "rps": 89.92,
+      "p50_ms": 5.48,
+      "p95_ms": 13.41,
+      "p99_ms": 35.78,
+      "cpu_api_pct_un_nucleo": 49.78,
+      "rss_api_max_mib": 369.7
+    },
+    {
+      "usuarios_virtuales": 25,
+      "duracion_s": 15.1,
+      "solicitudes": 3500,
+      "errores": 0,
+      "error_pct": 0.0,
+      "rps": 231.76,
+      "p50_ms": 3.07,
+      "p95_ms": 8.95,
+      "p99_ms": 15.98,
+      "cpu_api_pct_un_nucleo": 70.52,
+      "rss_api_max_mib": 379.42
+    }
+  ]
+}

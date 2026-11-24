@@ -1,0 +1,9 @@
+{
+  "url": "https://github.com/Deithmho/intranet-distribucion-apf2/actions/runs/45396928264",
+  "commit": "fd7e58d",
+  "pruebas": 22,
+  "fallos": 0,
+  "omitidas": 0,
+  "resultado": "success",
+  "motor": "Testcontainers PostgreSQL 17.11"
+}

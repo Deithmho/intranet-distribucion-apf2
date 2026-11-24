@@ -1,0 +1,330 @@
+{
+  "fecha": "2026-11-24T12:54:42.114602+00:00",
+  "base_url": "http://127.0.0.1:8083",
+  "casos": [
+    {
+      "caso": "Estado final",
+      "metodo": "GET",
+      "ruta": "/api/v1/public/estado",
+      "esperado": 200,
+      "obtenido": 200,
+      "respuesta": {
+        "estado": "OK",
+        "proyecto": "Intranet de distribución APF3"
+      }
+    },
+    {
+      "caso": "Recurso protegido sin JWT",
+      "metodo": "GET",
+      "ruta": "/api/v1/productos",
+      "esperado": 401,
+      "obtenido": 401,
+      "respuesta": {
+        "status": 401,
+        "mensaje": "Se requiere un token válido"
+      }
+    },
+    {
+      "caso": "Esquema OpenAPI Bearer global",
+      "metodo": "GET",
+      "ruta": "/v3/api-docs",
+      "esperado": 200,
+      "obtenido": 200,
+      "respuesta": {
+        "version": "0.3.0",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "esquema": {
+          "type": "http",
+          "scheme": "bearer",
+          "bearerFormat": "JWT"
+        },
+        "rutas": 22
+      }
+    },
+    {
+      "caso": "Login con renovación",
+      "metodo": "POST",
+      "ruta": "/api/v1/auth/login",
+      "esperado": 200,
+      "obtenido": 200,
+      "respuesta": {
+        "accessToken": "[REDACTADO]",
+        "refreshToken": "[REDACTADO]",
+        "expiresIn": 900,
+        "tokenType": "[REDACTADO]"
+      }
+    },
+    {
+      "caso": "Crear categoría",
+      "metodo": "POST",
+      "ruta": "/api/v1/categorias",
+      "esperado": 201,
+      "obtenido": 201,
+      "respuesta": {
+        "id": 1,
+        "nombre": "APF3-dffa3203",
+        "descripcion": null
+      }
+    },
+    {
+      "caso": "Crear sede",
+      "metodo": "POST",
+      "ruta": "/api/v1/sedes",
+      "esperado": 201,
+      "obtenido": 201,
+      "respuesta": {
+        "id": 1,
+        "codigo": "S-DFFA3203",
+        "nombre": "Sede académica",
+        "direccion": "Dirección simulada"
+      }
+    },
+    {
+      "caso": "Crear almacén 1",
+      "metodo": "POST",
+      "ruta": "/api/v1/almacenes",
+      "esperado": 201,
+      "obtenido": 201,
+      "respuesta": {
+        "id": 1,
+        "codigo": "A1-DFFA3203",
+        "nombre": "Almacén de prueba 1",
+        "sedeId": 1
+      }
+    },
+    {
+      "caso": "Crear almacén 2",
+      "metodo": "POST",
+      "ruta": "/api/v1/almacenes",
+      "esperado": 201,
+      "obtenido": 201,
+      "respuesta": {
+        "id": 2,
+        "codigo": "A2-DFFA3203",
+        "nombre": "Almacén de prueba 2",
+        "sedeId": 1
+      }
+    },
+    {
+      "caso": "Crear producto con historial",
+      "metodo": "POST",
+      "ruta": "/api/v1/productos",
+      "esperado": 201,
+      "obtenido": 201,
+      "respuesta": {
+        "id": 1,
+        "codigo": "H-DFFA3203",
+        "nombre": "Histórico",
+        "unidadMedida": "caja",
+        "stockMinimo": 5,
+        "categoriaId": 1,
+        "categoria": "APF3-dffa3203"
+      }
+    },
+    {
+      "caso": "Registrar entrada",
+      "metodo": "POST",
+      "ruta": "/api/v1/inventario/entradas",
+      "esperado": 201,
+      "obtenido": 201,
+      "respuesta": {
+        "id": 1,
+        "productoId": 1,
+        "origenId": null,
+        "destinoId": 1,
+        "cantidad": 10,
+        "tipo": "ENTRADA",
+        "motivo": "Prueba de conservación APF3",
+        "responsable": "admin@example.test",
+        "fecha": "2026-11-24T07:54:41.126163"
+      }
+    },
+    {
+      "caso": "Archivar producto con historial",
+      "metodo": "DELETE",
+      "ruta": "/api/v1/productos/1",
+      "esperado": 204,
+      "obtenido": 204,
+      "respuesta": null
+    },
+    {
+      "caso": "Producto archivado fuera del catálogo",
+      "metodo": "GET",
+      "ruta": "/api/v1/productos/1",
+      "esperado": 404,
+      "obtenido": 404,
+      "respuesta": {
+        "timestamp": "2026-11-24T07:54:41.149053",
+        "mensaje": "Registro no encontrado: 1",
+        "detalles": "NOT_FOUND"
+      }
+    },
+    {
+      "caso": "Archivar almacén con historial",
+      "metodo": "DELETE",
+      "ruta": "/api/v1/almacenes/1",
+      "esperado": 204,
+      "obtenido": 204,
+      "respuesta": null
+    },
+    {
+      "caso": "Almacén archivado fuera del catálogo",
+      "metodo": "GET",
+      "ruta": "/api/v1/almacenes/1",
+      "esperado": 404,
+      "obtenido": 404,
+      "respuesta": {
+        "timestamp": "2026-11-24T07:54:41.163737",
+        "mensaje": "Registro no encontrado: 1",
+        "detalles": "NOT_FOUND"
+      }
+    },
+    {
+      "caso": "Historial conservado y consultable",
+      "metodo": "GET",
+      "ruta": "/api/v1/inventario/movimientos",
+      "esperado": 200,
+      "obtenido": 200,
+      "respuesta": {
+        "registros": 1
+      }
+    },
+    {
+      "caso": "Renovar y rotar refresh token",
+      "metodo": "POST",
+      "ruta": "/api/v1/auth/refresh",
+      "esperado": 200,
+      "obtenido": 200,
+      "respuesta": {
+        "accessToken": "[REDACTADO]",
+        "refreshToken": "[REDACTADO]",
+        "expiresIn": 900,
+        "tokenType": "[REDACTADO]"
+      }
+    },
+    {
+      "caso": "Rechazar refresh reutilizado",
+      "metodo": "POST",
+      "ruta": "/api/v1/auth/refresh",
+      "esperado": 401,
+      "obtenido": 401,
+      "respuesta": {
+        "timestamp": "2026-11-24T07:54:41.21883",
+        "mensaje": "Credenciales incorrectas o usuario no habilitado",
+        "detalles": "UNAUTHORIZED"
+      }
+    },
+    {
+      "caso": "Revocar descendiente por replay",
+      "metodo": "POST",
+      "ruta": "/api/v1/auth/refresh",
+      "esperado": 401,
+      "obtenido": 401,
+      "respuesta": {
+        "timestamp": "2026-11-24T07:54:41.225425",
+        "mensaje": "Credenciales incorrectas o usuario no habilitado",
+        "detalles": "UNAUTHORIZED"
+      }
+    },
+    {
+      "caso": "Login con renovación",
+      "metodo": "POST",
+      "ruta": "/api/v1/auth/login",
+      "esperado": 200,
+      "obtenido": 200,
+      "respuesta": {
+        "accessToken": "[REDACTADO]",
+        "refreshToken": "[REDACTADO]",
+        "expiresIn": 900,
+        "tokenType": "[REDACTADO]"
+      }
+    },
+    {
+      "caso": "Cerrar familia de sesión",
+      "metodo": "POST",
+      "ruta": "/api/v1/auth/logout",
+      "esperado": 204,
+      "obtenido": 204,
+      "respuesta": null
+    },
+    {
+      "caso": "Refresh cerrado rechazado",
+      "metodo": "POST",
+      "ruta": "/api/v1/auth/refresh",
+      "esperado": 401,
+      "obtenido": 401,
+      "respuesta": {
+        "timestamp": "2026-11-24T07:54:41.3202",
+        "mensaje": "Credenciales incorrectas o usuario no habilitado",
+        "detalles": "UNAUTHORIZED"
+      }
+    },
+    {
+      "caso": "Solicitud simulada de acceso AUDITOR",
+      "metodo": "POST",
+      "ruta": "/api/v1/usuarios",
+      "esperado": 201,
+      "obtenido": 201,
+      "respuesta": {
+        "id": 2,
+        "rolId": 3,
+        "rolNombre": "AUDITOR",
+        "nombre": "Auditor",
+        "apellido": "Académico",
+        "email": "auditor-dffa3203@example.test",
+        "esActivo": true,
+        "fechaCreacion": "2026-11-24T07:54:41.415159"
+      }
+    },
+    {
+      "caso": "Ingreso del auditor de prueba",
+      "metodo": "POST",
+      "ruta": "/api/v1/auth/login",
+      "esperado": 200,
+      "obtenido": 200,
+      "respuesta": {
+        "accessToken": "[REDACTADO]",
+        "refreshToken": "[REDACTADO]",
+        "expiresIn": 900,
+        "tokenType": "[REDACTADO]"
+      }
+    },
+    {
+      "caso": "Auditor consulta inventario",
+      "metodo": "GET",
+      "ruta": "/api/v1/inventario",
+      "esperado": 200,
+      "obtenido": 200,
+      "respuesta": {
+        "registros": 0
+      }
+    },
+    {
+      "caso": "Auditor no modifica catálogo",
+      "metodo": "POST",
+      "ruta": "/api/v1/categorias",
+      "esperado": 403,
+      "obtenido": 403,
+      "respuesta": {
+        "timestamp": "2026-11-24T07:54:41.521119",
+        "mensaje": "Permiso insuficiente",
+        "detalles": "FORBIDDEN"
+      }
+    },
+    {
+      "caso": "Preparar 50 productos y 50 existencias para carga",
+      "esperado": 201,
+      "obtenido": 201,
+      "respuesta": {
+        "productos_creados": 50,
+        "entradas_creadas": 50
+      }
+    }
+  ],
+  "aprobados": 26,
+  "fallos": 0
+}

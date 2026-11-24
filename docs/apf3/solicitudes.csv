@@ -1,0 +1,4 @@
+id,tipo,descripcion,contexto,estado,evidencia
+SOL-001,Información,Consulta de especificación OpenAPI y endpoints,Simulación académica,Cerrada,GET /v3/api-docs 200 y esquema Bearer
+SOL-002,Acceso,Alta de AUDITOR con permiso de consulta,Simulación académica,Cerrada,POST usuarios 201; lectura 200; escritura 403
+SOL-003,Sesión,Renovación y cierre de sesión,Simulación académica,Cerrada,"Refresh 200, replay 401, logout 204"

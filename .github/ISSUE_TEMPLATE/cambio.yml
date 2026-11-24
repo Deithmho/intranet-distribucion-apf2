@@ -1,0 +1,26 @@
+name: Solicitud de cambio
+description: Control de aplicación, infraestructura, documentación o calendario
+title: "[RFC] "
+body:
+  - type: textarea
+    id: alcance
+    attributes:
+      label: Motivo, alcance, riesgo e impacto
+    validations:
+      required: true
+  - type: textarea
+    id: pruebas
+    attributes:
+      label: Pruebas y criterios de aceptación
+    validations:
+      required: true
+  - type: textarea
+    id: retorno
+    attributes:
+      label: Respaldo y plan de reversión
+    validations:
+      required: true
+  - type: input
+    id: aprobador
+    attributes:
+      label: Aprobador, ventana y versión destino

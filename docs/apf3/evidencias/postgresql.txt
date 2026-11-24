@@ -1,0 +1,39 @@
+ version |           description           | success 
+---------+---------------------------------+---------
+ 1       | esquema inicial                 | t
+ 2       | datos semilla                   | t
+ 3       | borrado logico y refresh tokens | t
+(3 rows)
+
+  entidad  | activo | count 
+-----------+--------+-------
+ productos | f      |     1
+ productos | t      |    50
+(2 rows)
+
+  entidad  | activo | count 
+-----------+--------+-------
+ almacenes | f      |     1
+ almacenes | t      |     1
+(2 rows)
+
+ movimientos_conservados 
+-------------------------
+                      51
+(1 row)
+
+ existencias_conservadas | unidades 
+-------------------------+----------
+                      51 |     1010
+(1 row)
+
+ longitud_hash_min | longitud_hash_max | sesiones 
+-------------------+-------------------+----------
+                64 |                64 |        4
+(1 row)
+
+ tablas 
+--------
+     12
+(1 row)
+

@@ -1,0 +1,19 @@
+{
+  "fecha": "2026-11-24T12:56:24.981327+00:00",
+  "resultado": "correcto",
+  "duracion_restauracion_y_verificacion_s": 0.357,
+  "registros_original": {
+    "productos": 51,
+    "movimientos": 51,
+    "existencias": 51,
+    "migraciones": 3
+  },
+  "registros_restaurados": {
+    "productos": 51,
+    "movimientos": 51,
+    "existencias": 51,
+    "migraciones": 3
+  },
+  "backup_sha256": "12afd62b696cf4d55ae035b9fc1c9511be6ab8d56e02ccf1e9db0038120a0d1f",
+  "nota": "Prueba local con una base pequeña; el archivo privado y sus datos no se publican."
+}

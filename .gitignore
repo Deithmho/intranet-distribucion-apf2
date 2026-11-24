@@ -45,3 +45,9 @@ out/
 !.env.example
 *.log
 postman/*local*.json
+
+# Datos privados del despliegue académico
+.runtime/
+
+__pycache__/
+*.pyc
