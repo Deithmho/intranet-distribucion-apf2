@@ -38,7 +38,8 @@ public class RefreshTokenService {
     private RefreshToken bloquear(String raw) {
         var t=refresh.findByTokenHash(hash(raw)).orElseThrow(() -> new BadCredentialsException("Refresh token no válido"));
         // Serializes rotations and replay detection for the same account.
-        usuarios.buscarParaLogin(t.getUsuario().getEmail()).orElseThrow(() -> new BadCredentialsException("Sesión no vigente"));
+        var u=usuarios.buscarParaLogin(t.getUsuario().getEmail()).orElseThrow(() -> new BadCredentialsException("Sesión no vigente"));
+        entityManager.refresh(u);
         refresh.flush();
         return t;
     }

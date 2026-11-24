@@ -1,4 +1,4 @@
-name: Validación APF2
+name: Validación APF3
 on: [push, pull_request, workflow_dispatch]
 permissions:
   contents: read
@@ -16,5 +16,5 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: resultados-pruebas-apf2
+          name: resultados-pruebas-apf3
           path: build/reports/tests/test/
